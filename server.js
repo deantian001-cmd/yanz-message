@@ -1,4 +1,4 @@
-
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -17,7 +17,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const sessionMiddleware = session({
-    secret: "yanz-message-secret-ganti-nanti",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
