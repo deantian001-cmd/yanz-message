@@ -1,0 +1,327 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yanz Message</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#080e18;--panel:#101b2a;--panel2:#172638;--green:#00e0a0;--muted:#8b9aab}
+body{margin:0;background:var(--bg);color:#f4f8fc;font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer;border:0}
+header{height:65px;background:#0d1826;border-bottom:1px solid #223044;display:flex;align-items:center;padding:0 20px;gap:12px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#00e0a0,#008fba);display:grid;place-items:center;font-size:21px}
+.brand{font-size:20px;font-weight:800;letter-spacing:.3px}
+.brand span{color:var(--green)}
+#auth{max-width:410px;margin:55px auto;padding:30px;background:var(--panel);border:1px solid #26374c;border-radius:22px;box-shadow:0 20px 70px #0008}
+.auth-logo{text-align:center;font-size:48px}
+#auth h2{text-align:center;margin-bottom:8px}
+.sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:25px}
+.field{margin:15px 0}
+.field label{display:block;font-size:12px;color:#a9b8c9;margin-bottom:8px}
+.field input{width:100%;padding:15px;background:#091421;border:1px solid #2a3c50;border-radius:11px;color:white;outline:none}
+.field input:focus{border-color:var(--green)}
+.primary{width:100%;padding:15px;border-radius:11px;background:linear-gradient(100deg,#00c98f,#00a9a4);color:#041b18;font-weight:800;margin-top:12px}
+#switch{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
+a{color:var(--green);cursor:pointer}
+#notice{color:#ff8c8c;text-align:center;font-size:13px}
+#app{display:none;height:calc(100dvh - 65px)}
+.layout{display:flex;height:100%;max-width:1250px;margin:auto}
+.sidebar{width:330px;flex-shrink:0;background:var(--panel);border-right:1px solid #223044;display:flex;flex-direction:column}
+.profile{padding:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #223044}
+.avatar{width:43px;height:43px;border-radius:50%;background:linear-gradient(135deg,#00d99b,#1479a9);display:grid;place-items:center;font-weight:bold;color:#06251d}
+.profile-info{flex:1;min-width:0}
+.profile-info b{display:block;overflow-wrap:anywhere}
+.profile-info small{color:var(--green)}
+.logout{background:#243448;color:#dce8f5;padding:9px 12px;border-radius:9px;font-size:12px}
+.search{padding:15px}
+.search input{width:100%;padding:13px;background:#091421;border:1px solid #293b50;border-radius:10px;color:white;outline:none}
+.section{padding:0 17px 10px;color:var(--muted);font-size:11px;font-weight:bold;letter-spacing:1.5px}
+#userList{overflow:auto;flex:1}
+.person{padding:14px 17px;display:flex;align-items:center;gap:12px;cursor:pointer;border-left:3px solid transparent}
+.person:hover{background:#192a3d}
+.person.active{background:#1b3042;border-left-color:var(--green)}
+.person .avatar{width:42px;height:42px;flex-shrink:0}
+.person-name{font-weight:bold;font-size:14px;overflow-wrap:anywhere}
+.person-desc{font-size:11px;color:var(--muted);margin-top:5px}
+.refresh{background:none;color:var(--green);padding:8px 17px;text-align:left}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:radial-gradient(ellipse at top right,#142b36 0%,#0b1421 45%,#080e18 100%)}
+.chat-head{height:72px;padding:12px 20px;border-bottom:1px solid #26364a;display:flex;align-items:center;gap:12px}
+.chat-head .avatar{width:42px;height:42px}
+#chatName{font-weight:bold}
+#chatStatus{font-size:11px;color:var(--green);margin-top:4px}
+#messages{flex:1;overflow:auto;padding:22px}
+.empty{height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:var(--muted)}
+.empty .big{font-size:65px;margin-bottom:12px}
+.empty b{color:white;font-size:18px;margin-bottom:8px}
+.msg-row{display:flex;margin:12px 0}
+.msg-row.mine{justify-content:flex-end}
+.bubble{max-width:78%;padding:12px 15px;border-radius:16px;background:#1b2b3d;overflow-wrap:anywhere;box-shadow:0 4px 15px #0002}
+.mine .bubble{background:linear-gradient(135deg,#087b68,#086c65);border-bottom-right-radius:4px}
+.theirs .bubble{border-bottom-left-radius:4px}
+.sender{font-size:11px;color:#8df2d4;font-weight:bold;margin-bottom:6px}
+.body{font-size:14px;line-height:1.5;white-space:pre-wrap}
+.time{font-size:10px;color:#b3c8c9;text-align:right;margin-top:7px}
+#send{display:flex;gap:10px;padding:15px 18px;border-top:1px solid #26364a;background:#101b2a}
+#message{flex:1;min-width:0;background:#091421;border:1px solid #30445a;border-radius:12px;padding:14px;color:white;outline:none}
+#message:focus{border-color:var(--green)}
+#send button{background:var(--green);color:#04251b;border-radius:12px;padding:0 22px;font-weight:bold}
+@media(max-width:600px){
+ header{height:58px}
+ #app{height:calc(100dvh - 58px)}
+ .sidebar{width:118px}
+ .profile{padding:10px 7px;flex-direction:column;text-align:center;gap:6px}
+ .profile .avatar{width:36px;height:36px}
+ .logout{padding:7px;font-size:10px}
+ .search{padding:8px}
+ .search input{padding:9px;font-size:11px}
+ .section{padding:5px;font-size:9px}
+ .person{padding:12px 6px;flex-direction:column;gap:5px;text-align:center}
+ .person .avatar{width:35px;height:35px}
+ .person-name{font-size:11px}
+ .person-desc{font-size:9px}
+ .refresh{padding:8px;font-size:10px}
+ .chat-head{padding:10px;height:62px}
+ #messages{padding:12px}
+ #send{padding:10px}
+ #send button{padding:0 14px}
+ .bubble{max-width:90%}
+}
+#send button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#send button:active {
+  transform: scale(0.88);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">✦</div>
+<div class="brand">YANZ <span>MESSAGE</span></div>
+</header>
+
+<div id="auth">
+<div class="auth-logo">💬</div>
+<h2 id="authTitle">Selamat Datang!</h2>
+<div class="sub">Masuk ke dunia percakapan Yanz Message</div>
+<div class="field">
+<label>USERNAME</label>
+<input id="username" placeholder="Masukkan username" autocomplete="username">
+</div>
+<div class="field">
+<label>PASSWORD</label>
+<input id="password" type="password" placeholder="Masukkan password" autocomplete="current-password">
+</div>
+<button class="primary" onclick="auth()" id="authButton">MASUK SEKARANG →</button>
+<p id="switch">Belum punya akun? <a onclick="toggle()">Daftar sekarang</a></p>
+<p id="notice"></p>
+</div>
+
+<div id="app">
+<div class="layout">
+<aside class="sidebar">
+<div class="profile">
+<div class="avatar" id="myAvatar">Y</div>
+<div class="profile-info">
+<b id="myName">Pengguna</b>
+<small>● Akun aktif</small>
+</div>
+<button class="logout" onclick="logout()">Keluar</button>
+</div>
+<div class="search">
+<input id="search" placeholder="Cari pengguna..." oninput="filterUsers()">
+</div>
+<div class="section">PENGGUNA</div>
+<div id="userList"></div>
+<button class="refresh" onclick="loadUsers()">↻ Segarkan daftar</button>
+</aside>
+
+<main class="main">
+<div class="chat-head">
+<div class="avatar" id="chatAvatar">?</div>
+<div>
+<div id="chatName">Yanz Message</div>
+<div id="chatStatus">Pilih pengguna untuk memulai</div>
+</div>
+</div>
+<div id="messages">
+<div class="empty">
+<div class="big">✦</div>
+<b>Selamat datang di Yanz Message</b>
+<span>Pilih pengguna di sebelah kiri untuk mulai mengobrol.</span>
+</div>
+</div>
+<form id="send">
+<input id="message" placeholder="Tulis pesan..." autocomplete="off" required>
+<button>Kirim ➤</button>
+</form>
+</main>
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+let registering=false,me="",selected="",socket=null,allUsers=[],onlineUsers=[];
+
+async function auth(){
+const username=document.getElementById("username").value.trim();
+const password=document.getElementById("password").value;
+const notice=document.getElementById("notice");
+if(!username||!password){notice.textContent="Isi username dan password!";return;}
+try{
+const r=await fetch(registering?"/register":"/login",{
+method:"POST",headers:{"Content-Type":"application/json"},
+credentials:"include",body:JSON.stringify({username,password})
+});
+const d=await r.json();
+if(!r.ok){notice.textContent=d.message;return;}
+me=d.username;startApp();
+}catch(e){notice.textContent="Server tidak terhubung";}
+}
+
+function toggle(){
+registering=!registering;
+document.getElementById("authTitle").textContent=registering?"Buat Akun Baru":"Selamat Datang!";
+document.getElementById("authButton").textContent=registering?"DAFTAR SEKARANG →":"MASUK SEKARANG →";
+document.getElementById("switch").innerHTML=registering?
+'Sudah punya akun? <a onclick="toggle()">Masuk</a>':
+'Belum punya akun? <a onclick="toggle()">Daftar sekarang</a>';
+document.getElementById("notice").textContent="";
+}
+
+async function startApp(){
+document.getElementById("auth").style.display="none";
+document.getElementById("app").style.display="block";
+document.getElementById("myName").textContent=me;
+document.getElementById("myAvatar").textContent=me.charAt(0).toUpperCase();
+socket=io();
+socket.on("online-users", users => {
+  onlineUsers = users;
+  filterUsers();
+});
+socket.on("private-message",data=>{
+if(data.from===selected||data.to===selected)addMessage(data);
+});
+await loadUsers();
+}
+
+async function loadUsers(){
+try{
+const r=await fetch("/users",{credentials:"include"});
+if(!r.ok)return;
+allUsers=await r.json();
+filterUsers();
+}catch(e){}
+}
+
+function filterUsers(){
+const q=document.getElementById("search").value.toLowerCase();
+const list=document.getElementById("userList");
+list.innerHTML="";
+const filtered=allUsers.filter(u=>u.username.toLowerCase().includes(q));
+if(!filtered.length){
+list.innerHTML='<div style="padding:15px;color:#8b9aab;font-size:12px">Belum ada pengguna lain.</div>';
+return;
+}
+filtered.forEach(user=>{
+const item=document.createElement("div");
+item.className="person"+(selected===user.username?" active":"");
+const av=document.createElement("div");
+av.className="avatar";
+av.textContent=user.username.charAt(0).toUpperCase();
+const info=document.createElement("div");
+const name=document.createElement("div");
+name.className="person-name";
+name.textContent=user.username;
+if (onlineUsers.includes(user.username)) {
+  const dot = document.createElement("span");
+  dot.style.cssText = "display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:8px;box-shadow:0 0 8px #22c55e;";
+  name.appendChild(dot);
+}
+const desc=document.createElement("div");
+desc.className="person-desc";
+desc.textContent="Mulai percakapan";
+info.append(name,desc);
+item.append(av,info);
+item.onclick=()=>openChat(user.username);
+list.appendChild(item);
+});
+}
+
+async function openChat(username){
+selected=username;
+document.getElementById("chatName").textContent=username;
+document.getElementById("chatAvatar").textContent=username.charAt(0).toUpperCase();
+document.getElementById("chatStatus").textContent="Percakapan pribadi";
+filterUsers();
+const box=document.getElementById("messages");
+box.innerHTML="";
+const r=await fetch("/messages/"+encodeURIComponent(username),{credentials:"include"});
+if(r.ok){
+const history=await r.json();
+history.forEach(addMessage);
+}
+}
+
+function addMessage(data){
+if(data.from!==me&&data.from!==selected)return;
+const box=document.getElementById("messages");
+const empty=box.querySelector(".empty");
+if(empty)empty.remove();
+const row=document.createElement("div");
+row.className="msg-row "+(data.from===me?"mine":"theirs");
+const bubble=document.createElement("div");
+bubble.className="bubble";
+const sender=document.createElement("div");
+sender.className="sender";
+sender.textContent=data.from===me?"Kamu":data.from;
+const body=document.createElement("div");
+body.className="body";
+body.textContent=data.message;
+const time=document.createElement("div");
+time.className="time";
+time.textContent=data.time;
+bubble.append(sender,body,time);
+row.appendChild(bubble);
+box.appendChild(row);
+row.animate(
+  [
+    { opacity: 0, transform: "translateY(12px) scale(0.98)" },
+    { opacity: 1, transform: "translateY(0) scale(1)" }
+  ],
+  { duration: 250, easing: "ease-out" }
+);
+box.scrollTop=box.scrollHeight;
+}
+
+document.getElementById("send").addEventListener("submit",e=>{
+e.preventDefault();
+const input=document.getElementById("message");
+const message=input.value.trim();
+if(!selected){alert("Pilih pengguna dulu!");return;}
+if(!message)return;
+socket.emit("private-message",{to:selected,message});
+input.value="";
+});
+
+async function logout(){
+await fetch("/logout",{method:"POST",credentials:"include"});
+location.reload();
+}
+
+async function checkLogin(){
+try{
+const r=await fetch("/me",{credentials:"include"});
+const d=await r.json();
+if(d.user){me=d.user.username;startApp();}
+}catch(e){}
+}
+checkLogin();
+</script>
+</body>
+</html>
